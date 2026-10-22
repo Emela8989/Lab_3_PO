@@ -43,6 +43,8 @@ jobs:
         pip install -r requirements.txt
 
     # Шаг 5: Запуск тестов через pytest
-    - name: Run tests with pytest
+    - name: Run tests with pytest and coverage
       run: |
-        pytest
+        ##Флаг --cov=, означает проверить покрытие всех файлов в текущей папке
+        ##Флаг --cov-fail-under=80 означает ошибку, если покрытие меньше 80%
+        pytest --cov=, --cov-fail-under=80

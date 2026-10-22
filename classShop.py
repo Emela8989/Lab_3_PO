@@ -2,11 +2,16 @@ class ElemCount(Exception):
     pass
 
 
-class Exc_Product(Exception):
+class ExcProduct(Exception):
     pass
 
+class PromoError(Exception):
+    pass
+
+promos = ["DISCOUNT10", "DISCOUNT20", "DISCOUNT50"]
 
 class Product:
+
     def __init__(self, id: str, name: str, price: int, stock: int):
         self.id = id
         self.name = name
@@ -15,12 +20,13 @@ class Product:
 
 
 
+
 class ShoppingCart:
     array: dict[str, int]
 
     def __init__(self):
         self.array: dict[str, int] = {}
-
+        self.discount: float = 0.0
 
     ##добавление товара в корзину
     def add(self, id: str, stock: int, data):
@@ -38,7 +44,7 @@ class ShoppingCart:
                 else:
                     raise ElemCount(f'Количество добавляемых товаров больше, чем есть на складе.')
 
-        raise Exc_Product(f'Данный товар отсутсвует на складе.')
+        raise ExcProduct(f'Данный товар отсутсвует на складе.')
 
 
 
@@ -61,7 +67,7 @@ class ShoppingCart:
                 raise ElemCount(f'В корзине нет такого количества товаров.')
 
         else:
-            raise Exc_Product(f'Данного товара нет в корзине.')
+            raise ExcProduct(f'Данного товара нет в корзине.')
 
 
     ##удаление товара из корзины
@@ -75,11 +81,11 @@ class ShoppingCart:
 
             return self.array
         else:
-            raise Exc_Product(f'Данного товара нет в корзине')
-
+            raise ExcProduct(f'Данного товара нет в корзине')
 
     ##полная стоимость товаров в корзине
     def all_cost(self, array):
+
 
         if len(self.array) > 0:
             cost = 0
@@ -87,6 +93,14 @@ class ShoppingCart:
                 if x.id in self.array:
                     cost += self.array[x.id] * x.price
 
-            return cost
+            return cost - cost * self.discount
         else:
-            raise Exc_Product(f'Корзина пуста!')
+            raise ExcProduct(f'Корзина пуста!')
+
+
+    ##метод для применения скидки
+    def promo_dis(self, promo: str):
+        if promo in promos:
+            self.discount = float(promo[8:])/100
+        else:
+            raise PromoError(f'Неверный промокод.')

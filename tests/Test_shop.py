@@ -1,5 +1,5 @@
 import pytest
-from classShop import Product, ShoppingCart, ElemCount, Exc_Product
+from classShop import Product, ShoppingCart, ElemCount, ExcProduct, PromoError
 
 array = []
 iphone = Product("123", "Iphone 16", 60000, 200)
@@ -30,7 +30,7 @@ def test_add():
         cart.add("125", 0, array)
     assert "Нельзя добавить 0 единиц товара" in str(ctx.value)
 
-    with pytest.raises(Exc_Product) as ctx:
+    with pytest.raises(ExcProduct) as ctx:
         cart.add("127", 200, array)
     assert "Данный товар отсутсвует на складе." in str(ctx.value)
 
@@ -58,7 +58,7 @@ def test_less():
     result = cart.less_count("123", 50, array)
     assert result == {"126": 200}
 
-    with pytest.raises(Exc_Product) as ctx:
+    with pytest.raises(ExcProduct) as ctx:
         cart.less_count("127", 200, array)
     assert "Данного товара нет в корзине." in str(ctx.value)
 
@@ -76,14 +76,14 @@ def test_del():
     assert array[0].stock == 200
     assert array[3].stock == 1000
 
-    with pytest.raises(Exc_Product) as ctx:
+    with pytest.raises(ExcProduct) as ctx:
         cart.del_product("123", array)
     assert "Данного товара нет в корзине" in str(ctx.value)
 
 def test_cost():
     cart = ShoppingCart()
 
-    with pytest.raises(Exc_Product) as ctx:
+    with pytest.raises(ExcProduct) as ctx:
         cart.all_cost(array)
     assert "Корзина пуста!" in str(ctx.value)
 
@@ -93,4 +93,29 @@ def test_cost():
     result = cart.add("126", 200, array)
 
     assert cart.all_cost(array) == 20600000
+
+    cart.del_product("123", array)
+    cart.del_product("124", array)
+    cart.del_product("125", array)
+    cart.del_product("126", array)
+
+def test_promo():
+    cart = ShoppingCart()
+
+    with pytest.raises(PromoError) as ctx:
+        cart.promo_dis("DISCOUNT14")
+    assert "Неверный промокод." in str(ctx.value)
+
+    result = cart.add("123", 100, array)
+    result = cart.add("124", 200, array)
+    result = cart.add("125", 100, array)
+    result = cart.add("126", 200, array)
+
+    cart.promo_dis("DISCOUNT10")
+
+    assert cart.all_cost(array) == 18540000
+
+    cart.promo_dis("DISCOUNT50")
+    assert cart.all_cost(array) == 10300000
+
 
