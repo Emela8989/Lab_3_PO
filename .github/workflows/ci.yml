@@ -1,0 +1,48 @@
+# Имя пайплайна (будет отображаться во вкладке Actions на GitHub)
+name: Python CI Pipeline
+
+# Условия запуска: пайплайн будет срабатывать при каждом Push или Pull Request
+# в ветки main или master
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+# Задачи, которые будут выполняться
+jobs:
+  build-and-test:
+    # Запускаем на последней версии Ubuntu (стандарт для GitHub Actions)
+    runs-on: ubuntu-latest
+
+    steps:
+    # Шаг 1: Клонирование кода из репозитория
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    # Шаг 2: Развертывание окружения Python
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10' # Укажите вашу версию (3.9, 3.10, 3.11 и т.д.)
+
+    # Шаг 3: Кэширование зависимостей (ускоряет работу пайплайна)
+    - name: Cache pip dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pip
+        # Кэш будет сбрасываться, если изменится файл requirements.txt
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    # Шаг 4: Установка пакетов из requirements.txt
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    # Шаг 5: Запуск тестов через pytest
+    - name: Run tests with pytest
+      run: |
+        pytest
