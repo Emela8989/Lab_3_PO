@@ -32,7 +32,7 @@ def test_add():
 
     with pytest.raises(ExcProduct) as ctx:
         cart.add("127", 200, array)
-    assert "Данный товар отсутсвует на складе." in str(ctx.value)
+    assert "Данный товар отсутствует на складе." in str(ctx.value)
 
     cart.del_product("123", array)
     cart.del_product("124", array)

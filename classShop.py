@@ -44,7 +44,7 @@ class ShoppingCart:
                 else:
                     raise ElemCount(f'Количество добавляемых товаров больше, чем есть на складе.')
 
-        raise ExcProduct(f'Данный товар отсутсвует на складе.')
+        raise ExcProduct(f'Данный товар отсутствует на складе.')
 
 
 
